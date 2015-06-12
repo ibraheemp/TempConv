@@ -41,9 +41,11 @@ __sco.func = {
 
 	load: function(){
 		__sco.editor1 = ace.edit("editor1");
+		__sco.editor1.setTheme("ace/theme/monokai");
 	    __sco.editor1.getSession().setMode("ace/mode/html");
 
 	    __sco.editor2 = ace.edit("editor2");
+	    __sco.editor2.setTheme("ace/theme/monokai");
 	    __sco.editor2.getSession().setMode("ace/mode/html");
 	},
 

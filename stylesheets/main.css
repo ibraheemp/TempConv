@@ -20,10 +20,18 @@
 
 #convert{
   font-family: 'Nixie One', cursive !important;
+  width: 100%;
+  background-color: #00adee;
 }
 
 #convert a, #copy{
   font-family: 'Nixie One', cursive  !important;
+  width: 100%;
+}
+
+#copy{
+	background-color: #ed028b;
+	text-transform: uppercase;
 }
 
 #editor1, #editor2{
