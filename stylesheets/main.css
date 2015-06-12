@@ -1,3 +1,7 @@
+html{
+	overflow: hidden;
+}
+
 #logo {
    font-family: 'Nixie One', cursive;
   font-size: 20px;
