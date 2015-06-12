@@ -15,10 +15,10 @@ __sco = {
 		'links' : ['[[webview]]', '#', '[[unsubscribe]]', 'tel']
 	},
 	'placeholders':{
-		'totalprice': 'item_totalprice',
+		'totalprice': '@(item_totalprice)', //"var item_totalpricedouble = 0.00; item_totalpricedouble = @product.Price * @product.Quantity; var item_totalprice = Math.Round(item_totalpricedouble, 2).ToString(\"0.00\");"
 		'totalvalue': '@Model.BasketValue',
 		'itemimage': 'product.ImageUrl',
-		'itemvalue' : 'item_price',
+		'itemvalue' : '@(item_price)', //var item_pricedouble = 0.00; item_pricedouble = @product.Price; var item_price = Math.Round(item_pricedouble, 2).ToString(\"0.00\");
 		'itemquantity': '@(product.Quantity)',
 		'itemquantity1': '@(product.Quantity)',
 		'itemcurrency': '@Model.CurrencyCode',
@@ -128,7 +128,7 @@ __sco.func = {
 					__scd.sessions.push(matches[i]);
 				break;
 
-				case matches[i].toLowerCase().indexOf('item') > -1 || matches[i].toLowerCase().indexOf('customfield') > -1 || matches[i].toLowerCase().indexOf('totalvalue') > -1 :
+				case matches[i].toLowerCase().indexOf('item') > -1 || matches[i].toLowerCase().indexOf('customfield') > -1 || matches[i].toLowerCase().indexOf('total') > -1 :
 					__scd.items.push(matches[i]);
 				break;
 
@@ -205,6 +205,22 @@ __sco.func = {
 								__scd.ihtml.indexOf(temp) <= -1 ?__scd.ihtml += temp : "";
 							break;
 
+							case val.toLowerCase().indexOf('itemvalue') > -1:
+								var old_item = '[[' + val + ']]';
+								var new_item = __sco.placeholders[val.toLowerCase()];
+								var temp = 'var item_pricedouble = 0.00; item_pricedouble = @product.Price; var item_price = Math.Round(item_pricedouble, 2).ToString(\"0.00\");\n';
+								__scd.html = __scd.html.replace(old_item, new_item);
+								__scd.ihtml.indexOf(temp) <= -1 ?__scd.ihtml += temp : "";
+							break;
+
+							case val.toLowerCase().indexOf('totalprice') > -1:
+								var old_item = '[[' + val + ']]';
+								var new_item = __sco.placeholders[val.toLowerCase()];
+								var temp = 'var item_totalpricedouble = 0.00; item_totalpricedouble = @product.Price * @product.Quantity; var item_totalprice = Math.Round(item_totalpricedouble, 2).ToString(\"0.00\");\n';
+								__scd.html = __scd.html.replace(old_item, new_item);
+								__scd.ihtml.indexOf(temp) <= -1 ?__scd.ihtml += temp : "";
+							break;
+
 							default:
 								var old_item = '[[' + val + ']]';
 							__scd.html = __scd.html.replace(old_item, __sco.placeholders[val.toLowerCase()]);
@@ -219,7 +235,9 @@ __sco.func = {
 
 
 		//replace the product list start and end
-		__scd.html = __scd.html.replace(/\[\[productlist:start*\S+\s+(\<tr\>)/gim, '@foreach(var product in Model.Products){\n<tr>\n' + __scd.ihtml);
+		//old regex /\[\[productlist:start*\S+\s+(\<tr\>)/gim
+		//new regex /\[\[productlist:start\]\]\s*(((?!\[start\]|\[end\]).)+)\s*\<tr\>/gmi
+		__scd.html = __scd.html.replace(/\[\[productlist:start\]\]\s*(((?!\[start\]|\[end\]).)+)\s*\<tr\>/gmi, '@foreach(var product in Model.Products){\n<tr>\n' + __scd.ihtml);
 		__scd.html = __scd.html.replace(/\[\[productlist:end\]\]/gi, '}');
 
 
