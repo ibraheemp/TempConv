@@ -1,0 +1,38 @@
+#logo {
+   font-family: 'Nixie One', cursive;
+  font-size: 20px;
+  padding: 20px;
+  color: white;
+  margin-top: -11px;
+ }
+
+#logo img{
+	width: 40px;
+}
+
+#logo a{
+	color:white;
+}
+
+#content{
+	width: 100%;
+}
+
+#convert{
+  font-family: 'Nixie One', cursive !important;
+}
+
+#convert a, #copy{
+  font-family: 'Nixie One', cursive  !important;
+}
+
+#editor1, #editor2{
+  min-height: 800px;
+  border: 2px solid #ccc;
+}
+
+.contentContainer {
+    width: 50%;
+    float: left;
+    padding:10px;
+}
