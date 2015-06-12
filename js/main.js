@@ -19,8 +19,8 @@ __sco = {
 		'totalvalue': '@Model.BasketValue',
 		'itemimage': 'product.ImageUrl',
 		'itemvalue' : 'item_price',
-		'itemquantity': 'product.Quantity',
-		'itemquantity1': 'product.Quantity',
+		'itemquantity': '@(product.Quantity)',
+		'itemquantity1': '@(product.Quantity)',
 		'itemcurrency': '@Model.CurrencyCode',
 		'customfield1': '@TryGetItemField(@product, \"f1\")', //var customfield1 = @TryGetItemField(@product, \"f1\");
 		'customfield2': ' @TryGetItemField(@product, \"f2\")', //same as above
@@ -192,7 +192,7 @@ __sco.func = {
 								var new_item = '@(' + val + ')';
 								var temp = 'var ' + val + '= @TryGetItemField(@product, \"f1\");\n';
 								__scd.html = __scd.html.replace(old_item, new_item);
-								__scd.ihtml += temp;
+								__scd.ihtml.indexOf(temp) <= -1 ?__scd.ihtml += temp : "";
 							break;
 
 							case val.toLowerCase().indexOf('customfield2') > -1:
@@ -200,7 +200,7 @@ __sco.func = {
 								var new_item = '@(' + val + ')';
 								var temp = 'var ' + val + '= @TryGetItemField(@product, \"f2\");\n';
 								__scd.html = __scd.html.replace(old_item, new_item);
-								__scd.ihtml += temp;
+								__scd.ihtml.indexOf(temp) <= -1 ?__scd.ihtml += temp : "";
 							break;
 
 							default:
