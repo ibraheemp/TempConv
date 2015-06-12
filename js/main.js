@@ -94,7 +94,7 @@ __sco.func = {
 
 			if(__sco.excludes.links.indexOf(old_link.toLowerCase()) <= -1){
 				if(old_link.indexOf('tel:') <= -1){
-					var new_link =  '[[link]]' + decodeURIComponent(href.replace(__sco.url, '')).split('|')[1] + '[[/link]]';
+					var new_link = old_link.indexOf('|') > -1 ?  '[[link]]' + decodeURIComponent(href.replace(__sco.url, '')).split('|')[1] + '[[/link]]' : old_link;
 					__scd.html = __scd.html.replace(old_link, new_link);
 				}
 			}else{
@@ -126,7 +126,7 @@ __sco.func = {
 					__scd.sessions.push(matches[i]);
 				break;
 
-				case matches[i].toLowerCase().indexOf('item') > -1 || matches[i].toLowerCase().indexOf('custom') > -1 || matches[i].toLowerCase().indexOf('totalvalue') > -1 :
+				case matches[i].toLowerCase().indexOf('item') > -1 || matches[i].toLowerCase().indexOf('customfield') > -1 || matches[i].toLowerCase().indexOf('totalvalue') > -1 :
 					__scd.items.push(matches[i]);
 				break;
 
@@ -138,25 +138,29 @@ __sco.func = {
 		}
 
 		//loop through sessions and replace with razor fields
-		 __scd.shtml += '@{\n';
-		for(var i=0; i<__scd.sessions.length;i++){
-			var val = __scd.sessions[i];
-			var new_session = '@(' + val.replace(':', '_')  + ')';
-			var old_session = '[[' + val + ']]';
-			__scd.html = __scd.html.replace(old_session, new_session);
-			var temp = 'var ' + val.replace(':', '_') + '= @TryGetSessionField("' + val.split(':')[1] + '");\n';
-			__scd.shtml.indexOf(temp) <= -1 ?__scd.shtml += temp : "";
-		}
-		__scd.shtml += '}\n';
+		if(__scd.sessions.length > 0){
+			 __scd.shtml += '@{\n';
+			for(var i=0; i<__scd.sessions.length;i++){
+				var val = __scd.sessions[i];
+				var new_session = '@(' + val.replace(':', '_')  + ')';
+				var old_session = '[[' + val + ']]';
+				__scd.html = __scd.html.replace(old_session, new_session);
+				var temp = 'var ' + val.replace(':', '_') + '= @TryGetSessionField("' + val.split(':')[1] + '");\n';
+				__scd.shtml.indexOf(temp) <= -1 ?__scd.shtml += temp : "";
+			}
+			__scd.shtml += '}\n';
+	    }
 
 
 		//loop through customer fields and replace with razor fields
-		for(var i=0; i<__scd.customer.length;i++){
-			var val = __scd.customer[i];
-			if(val.toLowerCase() in __sco.placeholders){
-				var old_item = '[[' + val + ']]';
-				if(val.toLowerCase() == 'customername'){ __scd.chtml += '@{var salutation = "there"; if(Model.Customer != null && string.IsNullOrEmpty(Model.Customer.FirstName) == false) { salutation = String.Format("{0}", Model.Customer.FirstName); }}' }
-				__scd.html = __scd.html.replace(old_item, __sco.placeholders[val.toLowerCase()]);
+		if(__scd.customer.length > 0){
+			for(var i=0; i<__scd.customer.length;i++){
+				var val = __scd.customer[i];
+				if(val.toLowerCase() in __sco.placeholders){
+					var old_item = '[[' + val + ']]';
+					if(val.toLowerCase() == 'customername'){ __scd.chtml += '@{var salutation = "there"; if(Model.Customer != null && string.IsNullOrEmpty(Model.Customer.FirstName) == false) { salutation = String.Format("{0}", Model.Customer.FirstName); }}' }
+					__scd.html = __scd.html.replace(old_item, __sco.placeholders[val.toLowerCase()]);
+				}
 			}
 		}
 
@@ -169,44 +173,46 @@ __sco.func = {
 		
 
 		//loop through item fields and replace with razor fields
-		__scd.ihtml += '@{\n';
-		for(var i=0;i<__scd.items.length;i++){
-			var val = __scd.items[i];
-			if(val.indexOf(':') > -1){
-				var temp = 'var ' + val.replace(':', '_') + '= @TryGetItemField(@product, ' + '"' + val.split(':')[1] + '");\n';
-				__scd.ihtml.indexOf(temp) <= -1 ?__scd.ihtml += temp : "";
-				var new_item = '@(' + val.replace(':','_') + ')';
-				var old_item = '[[' + val +  ']]';
-				__scd.html = __scd.html.replace(old_item, new_item);
-			}else{
-				if(val.toLowerCase() in __sco.placeholders){
-					switch(true){
+		if(__scd.items.length > 0){
+			__scd.ihtml += '@{\n';
+			for(var i=0;i<__scd.items.length;i++){
+				var val = __scd.items[i];
+				if(val.indexOf(':') > -1){
+					var temp = 'var ' + val.replace(':', '_') + '= @TryGetItemField(@product, ' + '"' + val.split(':')[1] + '");\n';
+					__scd.ihtml.indexOf(temp) <= -1 ?__scd.ihtml += temp : "";
+					var new_item = '@(' + val.replace(':','_') + ')';
+					var old_item = '[[' + val +  ']]';
+					__scd.html = __scd.html.replace(old_item, new_item);
+				}else{
+					if(val.toLowerCase() in __sco.placeholders){
+						switch(true){
 
-						case val.toLowerCase().indexOf('customfield1') > -1:
-							var old_item = '[[' + val + ']]';
-							var new_item = '@(' + val + ')';
-							var temp = 'var ' + val + '= @TryGetItemField(@product, \"f1\");\n';
-							__scd.html = __scd.html.replace(old_item, new_item);
-							__scd.ihtml += temp;
-						break;
+							case val.toLowerCase().indexOf('customfield1') > -1:
+								var old_item = '[[' + val + ']]';
+								var new_item = '@(' + val + ')';
+								var temp = 'var ' + val + '= @TryGetItemField(@product, \"f1\");\n';
+								__scd.html = __scd.html.replace(old_item, new_item);
+								__scd.ihtml += temp;
+							break;
 
-						case val.toLowerCase().indexOf('customfield2') > -1:
-							var old_item = '[[' + val + ']]';
-							var new_item = '@(' + val + ')';
-							var temp = 'var ' + val + '= @TryGetItemField(@product, \"f2\");\n';
-							__scd.html = __scd.html.replace(old_item, new_item);
-							__scd.ihtml += temp;
-						break;
+							case val.toLowerCase().indexOf('customfield2') > -1:
+								var old_item = '[[' + val + ']]';
+								var new_item = '@(' + val + ')';
+								var temp = 'var ' + val + '= @TryGetItemField(@product, \"f2\");\n';
+								__scd.html = __scd.html.replace(old_item, new_item);
+								__scd.ihtml += temp;
+							break;
 
-						default:
-							var old_item = '[[' + val + ']]';
-						__scd.html = __scd.html.replace(old_item, __sco.placeholders[val.toLowerCase()]);
-						break;
+							default:
+								var old_item = '[[' + val + ']]';
+							__scd.html = __scd.html.replace(old_item, __sco.placeholders[val.toLowerCase()]);
+							break;
+						}
 					}
 				}
 			}
+			__scd.ihtml += '}'
 		}
-		__scd.ihtml += '}'
 
 
 
