@@ -17,7 +17,7 @@ __sco = {
 	'placeholders':{
 		'totalprice': '@(item_totalprice)', //"var item_totalpricedouble = 0.00; item_totalpricedouble = @product.Price * @product.Quantity; var item_totalprice = Math.Round(item_totalpricedouble, 2).ToString(\"0.00\");"
 		'totalvalue': '@Model.BasketValue',
-		'itemimage': 'product.ImageUrl',
+		'itemimage': '@(product.ImageUrl)',
 		'itemvalue' : '@(item_price)', //var item_pricedouble = 0.00; item_pricedouble = @product.Price; var item_price = Math.Round(item_pricedouble, 2).ToString(\"0.00\");
 		'itemquantity': '@(product.Quantity)',
 		'itemquantity1': '@(product.Quantity)',
